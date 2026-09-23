@@ -1,0 +1,11 @@
+# docker-compose.yml — links curtos de ir.niucursos.com.br
+# Gerado automaticamente pelo AG Link Tracker.
+# No Dokploy, aponte o dominio ir.niucursos.com.br para a porta 80 deste service
+# (o Dokploy/Traefik cuida do SSL automaticamente).
+
+services:
+  short-links:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "80"

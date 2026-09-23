@@ -1,0 +1,39 @@
+# .htaccess — links curtos de ir.niucursos.com.br
+# Gerado automaticamente pelo AG Link Tracker.
+# Envie este arquivo para a pasta do subdominio, junto com o r.php.
+# Nao e preciso editar NADA aqui: funciona assim que os 2 arquivos estiverem
+# na pasta certa e o SSL do subdominio for emitido.
+
+# --- Comportamento geral ---
+# Nao lista o conteudo da pasta se alguem acessar sem slug
+Options -Indexes
+AddDefaultCharset UTF-8
+ServerSignature Off
+
+# Nao deixa cache/CDN guardar o redirect (o clique precisa ser contado
+# a cada visita e o link pode ser editado no painel a qualquer momento)
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store, no-cache, must-revalidate"
+</IfModule>
+
+# --- Redirecionamento dos links curtos ---
+RewriteEngine On
+RewriteBase /
+
+# Forca HTTPS so em conexoes DIRETAS (hospedagem comum).
+# Atras de proxy/Cloudflare o proprio proxy cuida do SSL — pular para nao
+# criar loop de redirecionamento.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} ^$
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Nao reescreve arquivos/pastas que existem de verdade (ex.: o proprio r.php)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# /meu-slug  ou  /meu-slug/  ->  r.php?slug=meu-slug
+# Query strings sao mantidas (ex.: /black-friday?origem=bio)
+RewriteRule ^([a-zA-Z0-9_-]+)/?$ r.php?slug=$1 [L,QSA]
+
+# Se TODOS os links derem 404, o .htaccess nao esta sendo lido:
+# peca ao suporte da hospedagem para habilitar "AllowOverride All".
