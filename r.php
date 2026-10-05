@@ -3,8 +3,8 @@
 // Gerado automaticamente pelo AG Link Tracker.
 // Coloque este arquivo na raiz do site (mesma pasta do .htaccess).
 
-$SUPA   = 'https://kkejinfqvqbnzwcwpako.supabase.co';
-$KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtrZWppbmZxdnFibnp3Y3dwYWtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2NzY4MzMsImV4cCI6MjA4OTI1MjgzM30.aMQ4IGBTSyLJV24z-kxaLyLU1yPxZqCLgbfTy1v_cUI';
+$SUPA   = 'https://trackapi.agwebia.com.br';
+$KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzkxMjI3NjM0LCJleHAiOjE5NDg5MDc2MzR9.nw4TouHG6uHenj9gmJzmFSYE2xaLJjkhIC6l1BH1_7c';
 // Dominio configurado no cliente/projeto (gerado automaticamente).
 // Este redirect so atende slugs de links cujo projeto ou cliente
 // esta configurado com ESTE dominio — slugs de outros dominios
