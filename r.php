@@ -11,14 +11,27 @@ $KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1
 // retornam 404 aqui.
 $DOMAIN = 'ir.niucursos.com.br';
 
+// Versao deste arquivo (o painel avisa quando o r.php instalado esta desatualizado)
+$VERSION = '2026-10-09';
+
 // Identificacao do script (usada pelo botao "Testar agora" do painel)
 header('X-AG-Tracker: 1');
 header('X-AG-Domain: ' . $DOMAIN);
+header('X-AG-Version: ' . $VERSION);
+
+// IP real do visitante (usado para descobrir pais/cidade no analytics).
+// Atras do Cloudflare ou de proxy, REMOTE_ADDR e o IP do proxy.
+$ip = ''; $ipFrom = '';
+if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) { $ip = $_SERVER['HTTP_CF_CONNECTING_IP']; $ipFrom = 'cf-connecting-ip'; }
+elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) { $ip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]); $ipFrom = 'x-forwarded-for'; }
+elseif (!empty($_SERVER['HTTP_X_REAL_IP'])) { $ip = $_SERVER['HTTP_X_REAL_IP']; $ipFrom = 'x-real-ip'; }
+else { $ip = $_SERVER['REMOTE_ADDR'] ?? ''; $ipFrom = 'remote_addr'; }
+$ipPublic = (bool)filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
 
 // Auto-diagnostico: /r.php?agcheck=1
 if (isset($_GET['agcheck'])) {
   header('Content-Type: application/json; charset=utf-8');
-  echo json_encode(['ag' => true, 'domain' => $DOMAIN, 'php' => PHP_VERSION, 'curl' => function_exists('curl_init')]);
+  echo json_encode(['ag' => true, 'domain' => $DOMAIN, 'v' => $VERSION, 'php' => PHP_VERSION, 'curl' => function_exists('curl_init'), 'ip_from' => $ipFrom, 'ip_public' => $ipPublic]);
   exit;
 }
 
@@ -77,12 +90,6 @@ foreach (['utm_source','utm_medium','utm_campaign','utm_term','utm_content','src
 // Robos e pre-visualizacoes nao contam como clique real
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $isBot = $ua === '' || preg_match('/(bot|crawl|spider|slurp|preview|fetch|monitor|headless|curl|wget|python-requests|axios|postman|facebookexternalhit|whatsapp|telegrambot|discordbot|slackbot|linkedinbot|twitterbot|embedly|pingdom|uptime|lighthouse|gtmetrix|semrush|ahrefs|dataprovider)/i', $ua) === 1;
-
-// IP real do visitante (usado para descobrir pais/cidade no analytics).
-// Atras do Cloudflare ou de proxy, REMOTE_ADDR e o IP do proxy.
-$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
-if (!$ip && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) $ip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
-if (!$ip) $ip = $_SERVER['REMOTE_ADDR'] ?? null;
 
 // Registra o clique (nao bloqueia o redirect por muito tempo)
 $payload = json_encode([
