@@ -78,10 +78,16 @@ foreach (['utm_source','utm_medium','utm_campaign','utm_term','utm_content','src
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $isBot = $ua === '' || preg_match('/(bot|crawl|spider|slurp|preview|fetch|monitor|headless|curl|wget|python-requests|axios|postman|facebookexternalhit|whatsapp|telegrambot|discordbot|slackbot|linkedinbot|twitterbot|embedly|pingdom|uptime|lighthouse|gtmetrix|semrush|ahrefs|dataprovider)/i', $ua) === 1;
 
+// IP real do visitante (usado para descobrir pais/cidade no analytics).
+// Atras do Cloudflare ou de proxy, REMOTE_ADDR e o IP do proxy.
+$ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? '';
+if (!$ip && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) $ip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+if (!$ip) $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+
 // Registra o clique (nao bloqueia o redirect por muito tempo)
 $payload = json_encode([
   'link_id'         => $link['id'],
-  'ip_address'      => $_SERVER['REMOTE_ADDR']     ?? null,
+  'ip_address'      => $ip ?: null,
   'user_agent'      => $ua ?: null,
   'referer'         => $_SERVER['HTTP_REFERER']    ?? null,
   'utm'             => (object)$utm,
